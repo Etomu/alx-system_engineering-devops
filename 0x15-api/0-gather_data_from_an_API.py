@@ -1,33 +1,32 @@
 #!/usr/bin/python3
 """
-Shows the complete tasks done by a specific employee ID
+a day more for die
 """
 
 import requests
-import sys
+from sys import argv
 
-if __name__ == "__main__":
-    # Get the todo list
-    url = 'https://jsonplaceholder.typicode.com/todos'
-    params = (('userId', sys.argv[1]),)
-    t = requests.get(url, params=params)
 
-    # Get the user info
-    url = 'https://jsonplaceholder.typicode.com/users'
-    params = (('id', sys.argv[1]),)
-    u = requests.get(url, params=params)
+def get_employee_tasks(user_id):
+    '''Retrieves employees and tasks'''
+    url = 'https://jsonplaceholder.typicode.com/'
+    user_req = url + 'users/{}'.format(user_id)
+    employee = requests.get(user_req).json()
+    task_req = url + 'todos?userId={}'.format(employee.get('id'))
+    tasks = requests.get(task_req).json()
+    return {"employee": employee, "tasks": tasks}
 
-    # Convert to json
-    todos = t.json()
-    user = u.json()
 
-    done = []
-    for task in todos:
-        if task['completed'] is True:
-            done.append(task)
+def print_completed_tasks(data):
+    total = len(data.get('tasks'))
+    completed_tasks = [t for t in data.get('tasks') if t.get('completed')]
+    completed = len(completed_tasks)
+    print('Employee {} is done with tasks({}/{}):'
+          .format(data.get('employee').get('name'), completed, total))
+    for task in completed_tasks:
+        print('\t {}'.format(task.get('title')))
 
-    print("Employee {} is done with tasks({}/{}):".
-          format(user[0]['name'], len(done), len(todos)))
-    if len(done) > 0:
-        for task in done:
-            print("\t {}".format(task['title']))
+
+if __name__ == '__main__':
+    data = get_employee_tasks(argv[1])
+    print_completed_tasks(data)
