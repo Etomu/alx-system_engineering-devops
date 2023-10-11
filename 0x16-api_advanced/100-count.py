@@ -31,7 +31,8 @@ def count_words(subreddit, word_list, instances={}, after="", count=0):
     except Exception:
         print("")
         return
-results = results.get("data")
+
+    results = results.get("data")
     after = results.get("after")
     count += results.get("dist")
     for c in results.get("children"):
@@ -51,4 +52,4 @@ results = results.get("data")
         instances = sorted(instances.items(), key=lambda kv: (-kv[1], kv[0]))
         [print("{}: {}".format(k, v)) for k, v in instances]
     else:
-        count_words(subreddit, word_list, instances, after, count)
+        count_words(subreddit, word_list, instances, after, count)
